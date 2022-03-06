@@ -2,7 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
 
 const config = new pulumi.Config();
-const serviceName = config.require("serviceName");
+const serviceName = pulumi.getProject();
 
 const deploymentName = `${serviceName}-deployment`
 const appLabels = { app: deploymentName }
@@ -42,3 +42,4 @@ const service = new k8s.core.v1.Service(k8sServiceName, {
 }, {
     dependsOn: deployment,
 });
+export const loadBalancerHost = service.status.loadBalancer.ingress[0].hostname;

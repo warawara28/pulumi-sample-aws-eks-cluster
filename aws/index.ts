@@ -2,7 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 
 const config = new pulumi.Config();
-export const projectName = config.require("projectName");
+const projectName = pulumi.getProject();
 
 const vpcName: string = `${projectName}-vpc`
 const vpc = new aws.ec2.Vpc(vpcName, {
@@ -78,7 +78,6 @@ const routeTableAssociationC = new aws.ec2.RouteTableAssociation(`${subnetNameC}
     routeTableId: routetableC.id,
 });
 
-
 const eksClusterRole = new aws.iam.Role(`${projectName}-eks-cluster-role`, {
     assumeRolePolicy: JSON.stringify({
         Version: "2012-10-17",
@@ -95,10 +94,6 @@ const eksClusterRole = new aws.iam.Role(`${projectName}-eks-cluster-role`, {
 const eksClusterRoleAttach1 = new aws.iam.RolePolicyAttachment(`role-policy-attachment-eks-cluster-policy`, {
     role: eksClusterRole.name,
     policyArn: "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
-});
-const eksClusterRoleAttach2 = new aws.iam.RolePolicyAttachment(`role-policy-attachment-eks-service-policy`, {
-    role: eksClusterRole.name,
-    policyArn: "arn:aws:iam::aws:policy/AmazonEKSServicePolicy",
 });
 
 const eksWorkerRole = new aws.iam.Role(`${projectName}-eks-worker-role`, {
@@ -134,6 +129,7 @@ const eksCluster = new aws.eks.Cluster(`${projectName}-eks-cluster`, {
         subnetIds: [subnetA.id, subnetC.id],
     },
 }, {});
+export const eksClusterName = eksCluster.name;
 
 const nodeGroupName: string = `${projectName}-eks-nodegroup`
 const nodeGroup = new aws.eks.NodeGroup(nodeGroupName, {

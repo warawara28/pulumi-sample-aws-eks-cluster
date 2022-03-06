@@ -19,7 +19,6 @@ Run this command.
 ```console
 pulumi config set aws:profile <your-profile>
 pulumi config set aws:region <your-region>
-pulumi config set pulumi-sample-aws:projectName pulumi-sample-project
 ```
 
 ## Deploy
